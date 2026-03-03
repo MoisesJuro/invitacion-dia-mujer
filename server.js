@@ -62,3 +62,25 @@ app.get("/", (req, res) => {
 app.listen(3000, () => {
   console.log("Servidor corriendo en http://localhost:3000");
 });
+
+app.get("/crear-tabla", (req, res) => {
+
+  const sql = `
+    CREATE TABLE IF NOT EXISTS confirmaciones (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      nombre VARCHAR(100) NOT NULL,
+      telefono VARCHAR(20),
+      iglesia VARCHAR(100),
+      fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+
+  db.query(sql, (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Error creando tabla" });
+    }
+    res.json({ mensaje: "Tabla creada correctamente" });
+  });
+
+});
