@@ -8,18 +8,23 @@ app.use(cors());
 app.use(express.json());
 
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "", // en XAMPP normalmente está vacío
-  database: "evento_mujeres"
+  host: process.env.MYSQLHOST,
+  user: process.env.MYSQLUSER,
+  password: process.env.MYSQLPASSWORD,
+  database: process.env.MYSQLDATABASE,
+  port: process.env.MYSQLPORT
 });
 
 db.connect(err => {
   if (err) {
-    console.error("Error conectando a MySQL", err);
+    console.error("Error conectando a MySQL:", err);
   } else {
-    console.log("Conectado a MySQL");
+    console.log("Conectado a MySQL Railway");
   }
+});
+
+app.get("/", (req, res) => {
+  res.send("Servidor invitación día de la mujer activo 🚀");
 });
 
 app.post("/confirmar", (req, res) => {
@@ -37,6 +42,7 @@ app.post("/confirmar", (req, res) => {
 
   db.query(sql, [nombre, telefono, iglesia], (err) => {
     if (err) {
+      console.error(err);
       return res.status(500).json({ error: "Error al guardar" });
     }
     res.json({ mensaje: "Guardado correctamente" });
@@ -48,6 +54,7 @@ app.get("/confirmaciones", (req, res) => {
 
   db.query("SELECT * FROM confirmaciones ORDER BY fecha DESC", (err, results) => {
     if (err) {
+      console.error(err);
       return res.status(500).json({ error: "Error al obtener datos" });
     }
     res.json(results);
@@ -77,9 +84,8 @@ app.get("/crear-tabla", (req, res) => {
 
 });
 
-
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log("Servidor corriendo");
+  console.log("Servidor corriendo en puerto " + PORT);
 });
